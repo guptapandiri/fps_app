@@ -4,6 +4,8 @@ import { getApiUrl } from "./utils/api";
 import type { CommodityList, Transaction } from "./types";
 import "./App.css";
 
+const REQUEST_TIMEOUT_MS = 12000;
+
 function App() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -37,10 +39,15 @@ function App() {
 
   useEffect(() => {
     const fetchTransactions = async () => {
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => {
+        controller.abort();
+      }, REQUEST_TIMEOUT_MS);
+
       try {
         setLoading(true);
         const url = getApiUrl();
-        const response = await fetch(url);
+        const response = await fetch(url, { signal: controller.signal });
 
         if (!response.ok) {
           throw new Error("Failed to fetch transaction data");
@@ -51,8 +58,15 @@ function App() {
         setError(null);
       } catch (err) {
         console.error("Error fetching transactions:", err);
-        setError("Could not load live data. Please check your connection.");
+        if (err instanceof DOMException && err.name === "AbortError") {
+          setError(
+            "Data request timed out. Public CORS proxies may be unavailable. Configure VITE_PROD_API_URL with your own proxy endpoint.",
+          );
+        } else {
+          setError("Could not load live data. Please check your connection.");
+        }
       } finally {
+        window.clearTimeout(timeoutId);
         setLoading(false);
       }
     };

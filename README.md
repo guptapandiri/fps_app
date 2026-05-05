@@ -6,15 +6,28 @@ This template provides a minimal setup to get React working in Vite with HMR and
 
 This app supports CORS bypass in production via configurable proxy URLs.
 
-1. Set **one** of these environment variables in your hosting provider:
-   - `VITE_PROD_API_URL` (recommended): full URL of your own proxy endpoint that returns JSON.
-   - `VITE_CORS_PROXY_TEMPLATE`: proxy template containing `{url}` placeholder.
-     - Example: `https://api.allorigins.win/raw?url={url}`
-2. Build and deploy:
-   - `npm run build`
-   - Deploy the `dist/` folder.
+### Netlify (default in this project)
 
-If neither variable is set, the app falls back to `https://api.allorigins.win/raw?url={url}`.
+This repository includes `netlify.toml` that proxies `/api/*` to `https://aepos.ap.gov.in/*`.
+
+- Production app requests `"/api/Epos_Spring/fps/fpstransaction?..."`
+- Netlify rewrites/proxies it server-side, so browser CORS is avoided.
+
+### Optional overrides
+
+Set these only if needed:
+- `VITE_PROD_API_URL`: full URL of your own proxy endpoint.
+- `VITE_USE_NETLIFY_PROXY=false`: disable Netlify path and use template mode.
+- `VITE_CORS_PROXY_TEMPLATE`: proxy template containing `{url}` placeholder.
+  - Example: `https://api.allorigins.win/raw?url={url}`
+
+### Build and deploy
+
+- Build:
+   - `npm run build`
+   - Deploy the `dist/` folder (with repository `netlify.toml`).
+
+If Netlify proxy is disabled and no custom URL is set, the app falls back to `https://api.allorigins.win/raw?url={url}`.
 
 Currently, two official plugins are available:
 
