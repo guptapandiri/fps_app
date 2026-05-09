@@ -69,3 +69,30 @@ export interface StockInfo {
   sales: number;
   closingBalance: number;
 }
+
+export interface StockRegisterEntry {
+  distNameEn: string | null;
+  distCode: string | null;
+  afso_name_en: string | null;
+  afsoCode: string | null;
+  fpsId: string;
+  commNameEn: string;
+  commId: string;
+  commMeasureUnit: string;
+  allottedQty: number;
+  ob: number;
+  receivedQty: number;
+  extraRo: number;
+  sixaCase: number;
+  issuedQty: number;
+  cb: number;
+  refreshTime: string;
+  scheme_id: number | null;
+  scheme_short_name: string | null;
+  prevMonth: string | null;
+  curntMonth: string | null;
+  type: string | null;
+  futrMonth: string | null;
+  fpsStatus: string | null;
+  shopType: string | null;
+}
