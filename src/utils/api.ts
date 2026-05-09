@@ -8,7 +8,9 @@
  *   4) default public bridge fallback
  */
 
-const FPS_QUERY = "fpsId=0684120&month=5&year=2026";
+export const FPS_ID = "0684120";
+
+const FPS_QUERY = `fpsId=${FPS_ID}&month=5&year=2026`;
 
 const TRANSACTION_API_PATH = `/Epos_Spring/fps/fpstransaction?${FPS_QUERY}`;
 const TRANSACTION_TARGET_URL = `https://aepos.ap.gov.in/Epos_Spring/fps/fpstransaction?${FPS_QUERY}`;

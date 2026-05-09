@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { mockShopDetails } from "./mockData";
-import { getStockApiUrl, getTransactionsApiUrl } from "./utils/api";
+import { FPS_ID, getStockApiUrl, getTransactionsApiUrl } from "./utils/api";
 import type { CommodityList, StockRegisterEntry, Transaction } from "./types";
 import { TransactionsAccordion } from "./TransactionsAccordion";
 import { StockAccordion } from "./StockAccordion";
+import { PortabilityAccordion } from "./PortabilityAccordion";
 import "./App.css";
 import "./accordion.css";
 
@@ -158,6 +159,42 @@ function App() {
     (acc, curr) => acc + getQty(curr, "FRice"),
     0,
   );
+  const portabilityRows = Array.from(
+    transactions
+      .reduce((acc, txn) => {
+        const portCheck = txn.portCheck?.trim() || "Unknown";
+        const existing = acc.get(portCheck) ?? {
+          portCheck,
+          count: 0,
+          totalAmount: 0,
+        };
+
+        existing.count += 1;
+        existing.totalAmount += parseFloat(txn.amount || "0");
+        acc.set(portCheck, existing);
+
+        return acc;
+      }, new Map<string, { portCheck: string; count: number; totalAmount: number }>())
+      .values(),
+  ).sort((a, b) => {
+    const aIsSelf = a.portCheck.toLowerCase() === "self";
+    const bIsSelf = b.portCheck.toLowerCase() === "self";
+
+    if (aIsSelf && !bIsSelf) return -1;
+    if (!aIsSelf && bIsSelf) return 1;
+    if (b.count !== a.count) return b.count - a.count;
+    return a.portCheck.localeCompare(b.portCheck);
+  });
+  const selfCount =
+    portabilityRows.find((row) => row.portCheck.toLowerCase() === "self")
+      ?.count ?? 0;
+  const portabilityCount = Math.max(transactions.length - selfCount, 0);
+  const otherShopCount = portabilityRows.filter(
+    (row) => row.portCheck.toLowerCase() !== "self",
+  ).length;
+
+  const mainPortability = portabilityRows.filter((row) => row.count > 10);
+  const otherPortability = portabilityRows.filter((row) => row.count <= 10);
   const riceStock = stockEntries.find(
     (s) => s.commNameEn === "FRice" && s.type?.toUpperCase() === "PDS",
   );
@@ -299,6 +336,61 @@ function App() {
           </div>
         </div>
 
+        {/* Portability Card */}
+        <div className="card">
+          <div className="card-title">
+            <span>Portability</span>
+            <small style={{ color: "var(--text-muted)", fontWeight: 600 }}>
+              {transactionsLoading
+                ? "Loading counts..."
+                : `Self: ${selfCount} | Other: ${portabilityCount} | Shops: ${otherShopCount}`}
+            </small>
+          </div>
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Port Check</th>
+                  <th>Transactions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactionsLoading ? (
+                  <tr className="loading-row">
+                    <td colSpan={4}>Loading portability summary...</td>
+                  </tr>
+                ) : mainPortability.length > 0 ? (
+                  mainPortability.map((row) => {
+
+                    return (
+                      <tr key={row.portCheck}>
+                        <td>
+                          <strong>{row.portCheck} {row.portCheck === 'Self' && `(${FPS_ID})`}</strong>
+                        </td>
+                        <td>{row.count}</td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={4} style={{ textAlign: "center", padding: "20px" }}>
+                      No portability data found for the selected period.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Other Portability Accordion */}
+        {otherPortability.length > 0 && (
+          <PortabilityAccordion
+            portabilityRows={otherPortability}
+            loading={transactionsLoading}
+          />
+        )}
+
         {/* Stock Status Card */}
         <div className="card">
           <div className="card-title">Stock Summary (Current Month)</div>
@@ -315,7 +407,7 @@ function App() {
               <tbody>
                 {stockLoading ? (
                   <tr className="loading-row">
-                    <td colSpan={6}>Loading stock summary...</td>
+                    <td colSpan={4}>Loading stock summary...</td>
                   </tr>
                 ) : activeStock.length > 0 ? (
                   activeStock.map((s, idx) => (
@@ -334,7 +426,7 @@ function App() {
                 ) : (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={4}
                       style={{ textAlign: "center", padding: "20px" }}
                     >
                       No active stock for the selected period.

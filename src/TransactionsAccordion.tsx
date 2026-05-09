@@ -45,15 +45,16 @@ export function TransactionsAccordion({
             <table>
               <thead>
                 <tr>
+                  <th>SNo</th>
                   <th>RC No</th>
                   <th>Scheme</th>
                   <th>Receipt No</th>
                   <th>Date & Time</th>
                   <th>Rice (Kg)</th>
                   <th>Sugar (Kg)</th>
-                  <th>Atta (Pkt)</th>
                   <th>Amount</th>
-                  <th>Auth Time</th>
+                  <th>Port Shop</th>
+                 
                 </tr>
               </thead>
               <tbody>
@@ -64,6 +65,7 @@ export function TransactionsAccordion({
                 ) : transactions.length > 0 ? (
                   transactions.map((t, idx) => (
                     <tr key={idx}>
+                      <td>{idx + 1}</td>
                       <td>
                         <strong>{t.existingRcNumber}</strong>
                       </td>
@@ -76,13 +78,8 @@ export function TransactionsAccordion({
                       <td>{t.loginTime}</td>
                       <td>{getQty(t, "FRice")}</td>
                       <td>{getQty(t, "SUGAR HALF KG")}</td>
-                      <td>{getQty(t, "WM Atta Pkt")}</td>
                       <td>₹{parseFloat(t.amount || "0").toFixed(2)}</td>
-                      <td>
-                        <span className="badge badge-success">
-                          {t.transTime}s
-                        </span>
-                      </td>
+                      <td>{t.portCheck}</td>
                     </tr>
                   ))
                 ) : (
