@@ -27,14 +27,6 @@ export function TransactionsAccordion({
           <span>Recent Transactions</span>
         </div>
         <div className="accordion-controls">
-          <button
-            className="view-all-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            View All
-          </button>
           <span className="accordion-icon">{isOpen ? "▼" : "▶"}</span>
         </div>
       </div>
