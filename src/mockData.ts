@@ -2,7 +2,7 @@ import type { ShopDetails, StockInfo, Transaction } from "./types";
 
 export const mockShopDetails: ShopDetails = {
   fpsId: "0684120",
-  ownerName: "ABCD",
+  ownerName: "Subrahmanyam",
   location: "Vijayawada, Ward 12",
   district: "NTR",
   mandal: "Vijayawada Urban",
