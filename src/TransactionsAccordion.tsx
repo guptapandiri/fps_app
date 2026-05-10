@@ -7,6 +7,8 @@ interface TransactionsAccordionProps {
   loading: boolean;
 }
 
+const TRANSACTIONS_SCROLL_THRESHOLD = 50;
+
 export function TransactionsAccordion({
   transactions,
   loading,
@@ -29,11 +31,13 @@ export function TransactionsAccordion({
         <div className="accordion-controls">
           <span className="accordion-icon">{isOpen ? "▼" : "▶"}</span>
         </div>
-      </div>
+        </div>
 
       {isOpen && (
         <div className="accordion-content">
-          <div className="table-container">
+          <div
+            className={`table-container ${!loading && transactions.length > TRANSACTIONS_SCROLL_THRESHOLD ? "table-scroll-50" : ""}`}
+          >
             <table>
               <thead>
                 <tr>
