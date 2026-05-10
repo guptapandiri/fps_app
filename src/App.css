@@ -286,6 +286,16 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+.table-container.table-scroll-10 {
+  max-height: calc(44px + (10 * 49px));
+  overflow-y: auto;
+}
+
+.table-container.table-scroll-50 {
+  max-height: calc(44px + (50 * 49px));
+  overflow-y: auto;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;

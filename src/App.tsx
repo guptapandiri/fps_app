@@ -7,13 +7,12 @@ import {
 } from "./utils/api";
 import type { CommodityList, StockRegisterEntry, Transaction } from "./types";
 import { TransactionsAccordion } from "./TransactionsAccordion";
-import { StockAccordion } from "./StockAccordion";
-import { PortabilityAccordion } from "./PortabilityAccordion";
 import "./App.css";
 import "./accordion.css";
 
 const REQUEST_TIMEOUT_MS = 12000;
 const FPS_STORAGE_KEY = "fpsId";
+const SUMMARY_SCROLL_THRESHOLD = 10;
 const getInitialFpsId = () =>
   window.localStorage.getItem(FPS_STORAGE_KEY)?.trim() || FPS_ID;
 
@@ -215,15 +214,10 @@ function App() {
     (row) => row.portCheck.toLowerCase() !== "self",
   ).length;
 
-  const mainPortability = portabilityRows.filter((row) => row.count > 10);
-  const otherPortability = portabilityRows.filter((row) => row.count <= 10);
   const riceStock = stockEntries.find(
     (s) => s.commNameEn === "FRice" && s.type?.toUpperCase() === "PDS",
   );
   const riceClosingBalance = riceStock?.cb ?? 0;
-
-  const activeStock = stockEntries.filter((s) => s.receivedQty > 0);
-  const otherStock = stockEntries.filter((s) => s.receivedQty <= 0);
 
   return (
     <div className="dashboard-container">
@@ -386,7 +380,9 @@ function App() {
                 : `Self: ${selfCount} | Other: ${portabilityCount} | Shops: ${otherShopCount}`}
             </small>
           </div>
-          <div className="table-container">
+          <div
+            className={`table-container ${!transactionsLoading && portabilityRows.length > SUMMARY_SCROLL_THRESHOLD ? "table-scroll-10" : ""}`}
+          >
             <table>
               <thead>
                 <tr>
@@ -399,8 +395,8 @@ function App() {
                   <tr className="loading-row">
                     <td colSpan={4}>Loading portability summary...</td>
                   </tr>
-                ) : mainPortability.length > 0 ? (
-                  mainPortability.map((row) => {
+                ) : portabilityRows.length > 0 ? (
+                  portabilityRows.map((row) => {
 
                     return (
                       <tr key={row.portCheck}>
@@ -423,18 +419,12 @@ function App() {
           </div>
         </div>
 
-        {/* Other Portability Accordion */}
-        {otherPortability.length > 0 && (
-          <PortabilityAccordion
-            portabilityRows={otherPortability}
-            loading={transactionsLoading}
-          />
-        )}
-
         {/* Stock Status Card */}
         <div className="card">
           <div className="card-title">Stock Summary (Current Month)</div>
-          <div className="table-container">
+          <div
+            className={`table-container ${!stockLoading && stockEntries.length > SUMMARY_SCROLL_THRESHOLD ? "table-scroll-10" : ""}`}
+          >
             <table>
               <thead>
                 <tr>
@@ -449,8 +439,8 @@ function App() {
                   <tr className="loading-row">
                     <td colSpan={4}>Loading stock summary...</td>
                   </tr>
-                ) : activeStock.length > 0 ? (
-                  activeStock.map((s, idx) => (
+                ) : stockEntries.length > 0 ? (
+                  stockEntries.map((s, idx) => (
                     <tr key={`${s.type ?? "NA"}-${s.commId}-${idx}`}>
                       <td>
                         <strong>{s.commNameEn}</strong>
@@ -477,11 +467,6 @@ function App() {
             </table>
           </div>
         </div>
-
-        {/* Other Stock Accordion */}
-        {otherStock.length > 0 && (
-          <StockAccordion stockEntries={otherStock} loading={stockLoading} />
-        )}
 
         {/* Transactions Accordion */}
         <TransactionsAccordion
