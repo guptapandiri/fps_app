@@ -157,6 +157,45 @@ body {
   text-align: left;
 }
 
+.fps-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: white;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+
+.fps-search-bar label {
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.fps-search-bar input {
+  min-width: 180px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.fps-search-bar button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  font: inherit;
+  cursor: pointer;
+}
+
+.fps-search-bar button:hover {
+  opacity: 0.92;
+}
+
 /* Stats Grid */
 .stats-grid {
   display: grid;

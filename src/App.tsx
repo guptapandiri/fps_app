@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { mockShopDetails } from "./mockData";
-import { FPS_ID, getStockApiUrl, getTransactionsApiUrl } from "./utils/api";
+import {
+  FPS_ID,
+  getStockApiUrlByFpsId,
+  getTransactionsApiUrlByFpsId,
+} from "./utils/api";
 import type { CommodityList, StockRegisterEntry, Transaction } from "./types";
 import { TransactionsAccordion } from "./TransactionsAccordion";
 import { StockAccordion } from "./StockAccordion";
@@ -9,10 +13,15 @@ import "./App.css";
 import "./accordion.css";
 
 const REQUEST_TIMEOUT_MS = 12000;
+const FPS_STORAGE_KEY = "fpsId";
+const getInitialFpsId = () =>
+  window.localStorage.getItem(FPS_STORAGE_KEY)?.trim() || FPS_ID;
 
 function App() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [fpsInput, setFpsInput] = useState(getInitialFpsId);
+  const [selectedFpsId, setSelectedFpsId] = useState(getInitialFpsId);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [stockEntries, setStockEntries] = useState<StockRegisterEntry[]>([]);
   const [transactionsLoading, setTransactionsLoading] = useState(true);
@@ -79,14 +88,15 @@ function App() {
     const fetchDashboardData = async () => {
       setTransactionsLoading(true);
       setStockLoading(true);
+      setError(null);
       try {
         const [transactionsResult, stockResult] = await Promise.allSettled([
           fetchJson<Transaction[]>(
-            getTransactionsApiUrl(),
+            getTransactionsApiUrlByFpsId(selectedFpsId),
             "Failed to fetch transaction data",
           ),
           fetchJson<StockRegisterEntry[]>(
-            getStockApiUrl(),
+            getStockApiUrlByFpsId(selectedFpsId),
             "Failed to fetch stock summary data",
           ),
         ]);
@@ -135,7 +145,19 @@ function App() {
       controller.abort();
       window.clearTimeout(timeoutId);
     };
-  }, []);
+  }, [selectedFpsId]);
+
+  const handleSearch = () => {
+    const trimmedFpsId = fpsInput.trim();
+    if (!trimmedFpsId) {
+      setError("Please enter an FPS number.");
+      return;
+    }
+
+    window.localStorage.setItem(FPS_STORAGE_KEY, trimmedFpsId);
+    setSelectedFpsId(trimmedFpsId);
+    setError(null);
+  };
 
   const TODAY_STR = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD" 
 
@@ -284,8 +306,26 @@ function App() {
               Welcome back, {mockShopDetails.ownerName}
             </p>
           </div>
+          <div className="fps-search-bar">
+            <label htmlFor="fps-id-input">FPS</label>
+            <input
+              id="fps-id-input"
+              type="text"
+              value={fpsInput}
+              onChange={(event) => setFpsInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleSearch();
+                }
+              }}
+              placeholder="Enter FPS Number"
+            />
+            <button type="button" onClick={handleSearch}>
+              Search
+            </button>
+          </div>
           <div className="shop-info-badge">
-            <strong>Shop ID:</strong> {mockShopDetails.fpsId} |{" "}
+            <strong>Shop ID:</strong> {selectedFpsId} |{" "}
             <strong>Location:</strong> {mockShopDetails.location}
           </div>
         </header>
@@ -365,7 +405,7 @@ function App() {
                     return (
                       <tr key={row.portCheck}>
                         <td>
-                          <strong>{row.portCheck} {row.portCheck === 'Self' && `(${FPS_ID})`}</strong>
+                          <strong>{row.portCheck} {row.portCheck === "Self" && `(${selectedFpsId})`}</strong>
                         </td>
                         <td>{row.count}</td>
                       </tr>
