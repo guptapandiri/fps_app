@@ -313,6 +313,11 @@ function App() {
               type="text"
               value={fpsInput}
               onChange={(event) => setFpsInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleSearch();
+                }
+              }}
               placeholder="Enter FPS Number"
             />
             <button type="button" onClick={handleSearch}>
