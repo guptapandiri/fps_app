@@ -10,16 +10,6 @@
 
 export const FPS_ID = "0684120";
 
-const FPS_QUERY = `fpsId=${FPS_ID}&month=5&year=2026`;
-
-const TRANSACTION_API_PATH = `/Epos_Spring/fps/fpstransaction?${FPS_QUERY}`;
-const TRANSACTION_TARGET_URL = `https://aepos.ap.gov.in/Epos_Spring/fps/fpstransaction?${FPS_QUERY}`;
-const TRANSACTION_NETLIFY_PROXY_PATH = `/api/Epos_Spring/fps/fpstransaction?${FPS_QUERY}`;
-
-const STOCK_API_PATH = `/Epos_Spring/fps/getfpsStockregisterOld?${FPS_QUERY}`;
-const STOCK_TARGET_URL = `https://aepos.ap.gov.in/Epos_Spring/fps/getfpsStockregisterOld?${FPS_QUERY}`;
-const STOCK_NETLIFY_PROXY_PATH = `/api/Epos_Spring/fps/getfpsStockregisterOld?${FPS_QUERY}`;
-
 const DEFAULT_PROXY_TEMPLATE = "https://api.allorigins.win/raw?url={url}";
 
 const buildProxyUrl = (template: string, targetUrl: string) => {
@@ -31,18 +21,21 @@ const buildProxyUrl = (template: string, targetUrl: string) => {
 };
 
 type EndpointConfig = {
-  apiPath: string;
-  targetUrl: string;
-  netlifyPath: string;
+  endpointPath: string;
+  fpsId: string;
   prodApiUrl?: string;
 };
 
 const resolveEndpointUrl = ({
-  apiPath,
-  targetUrl,
-  netlifyPath,
+  endpointPath,
+  fpsId,
   prodApiUrl,
 }: EndpointConfig) => {
+  const fpsQuery = `fpsId=${fpsId}&month=5&year=2026`;
+  const apiPath = `${endpointPath}?${fpsQuery}`;
+  const targetUrl = `https://aepos.ap.gov.in${endpointPath}?${fpsQuery}`;
+  const netlifyPath = `/api${endpointPath}?${fpsQuery}`;
+
   if (import.meta.env.DEV) {
     return apiPath;
   }
@@ -64,18 +57,32 @@ const resolveEndpointUrl = ({
 
 export const getTransactionsApiUrl = () => {
   return resolveEndpointUrl({
-    apiPath: TRANSACTION_API_PATH,
-    targetUrl: TRANSACTION_TARGET_URL,
-    netlifyPath: TRANSACTION_NETLIFY_PROXY_PATH,
+    endpointPath: "/Epos_Spring/fps/fpstransaction",
+    fpsId: FPS_ID,
+    prodApiUrl: import.meta.env.VITE_PROD_API_URL,
+  });
+};
+
+export const getTransactionsApiUrlByFpsId = (fpsId: string) => {
+  return resolveEndpointUrl({
+    endpointPath: "/Epos_Spring/fps/fpstransaction",
+    fpsId,
     prodApiUrl: import.meta.env.VITE_PROD_API_URL,
   });
 };
 
 export const getStockApiUrl = () => {
   return resolveEndpointUrl({
-    apiPath: STOCK_API_PATH,
-    targetUrl: STOCK_TARGET_URL,
-    netlifyPath: STOCK_NETLIFY_PROXY_PATH,
+    endpointPath: "/Epos_Spring/fps/getfpsStockregisterOld",
+    fpsId: FPS_ID,
+    prodApiUrl: import.meta.env.VITE_PROD_STOCK_API_URL,
+  });
+};
+
+export const getStockApiUrlByFpsId = (fpsId: string) => {
+  return resolveEndpointUrl({
+    endpointPath: "/Epos_Spring/fps/getfpsStockregisterOld",
+    fpsId,
     prodApiUrl: import.meta.env.VITE_PROD_STOCK_API_URL,
   });
 };
