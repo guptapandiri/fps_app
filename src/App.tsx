@@ -399,8 +399,14 @@ function App() {
               <thead>
                 <tr>
                   <th>Commodity</th>
-                  <th>Received (Kg)</th>
-                  <th>Sales (Kg)</th>
+                  <th>Type</th>
+                  <th>Units</th>
+                  <th>Allocated</th>
+                  <th>OB Qty</th>
+                  <th>Regular</th>
+                  <th>Extra</th>
+                  <th>Moved</th>
+                  <th>Issued Qty</th>
                   <th>Closing Bal (Kg)</th>
                 </tr>
               </thead>
@@ -415,8 +421,13 @@ function App() {
                       <td>
                         <strong>{s.commNameEn}</strong>
                       </td>
-     
+                      <td>{s.type}</td>
+                      <td>{s.commMeasureUnit}</td>
+                      <td>{s.allottedQty.toFixed(3)}</td>
+                      <td>{s.ob.toFixed(3)}</td>
                       <td>{s.receivedQty.toFixed(3)}</td>
+                      <td>{s.extraRo.toFixed(3)}</td>
+                      <td>{s.sixaCase.toFixed(3)}</td>
                       <td style={{ color: "var(--success)", fontWeight: "600" }}>
                         {s.issuedQty.toFixed(3)}
                       </td>
