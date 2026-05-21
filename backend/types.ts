@@ -1,7 +1,10 @@
 export type Customer = {
-    rcNumber: string;
     name: string;
-    phone: string;
-    address: string;
+    rcNumber?: string;
+    phone?: string;
+    address?: string;
+    shop_no?: number;
+    aadhar?: string;
+    kgs?: number;
     isDeleted?: boolean;
 }

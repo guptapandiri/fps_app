@@ -9,10 +9,13 @@ datasource db {
 
 model Customer {
   id        String   @id @default(cuid())
-  rcNumber  String   @unique
+  rcNumber  String?   @unique
   name      String
   phone     String?
-  address   String
+  address   String?
+  shop_no   Int?
+  aadhar    String?
+  kgs       Float?
   isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

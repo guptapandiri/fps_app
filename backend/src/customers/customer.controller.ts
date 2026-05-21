@@ -5,9 +5,12 @@ import type { Customer } from "../../types.ts";
 
 const customerSchema = z.object({
     name: z.string().max(100),
-    rcNumber: z.string().max(50),
-    phone: z.string().max(20),
-    address: z.string().max(200),
+    rcNumber: z.string().max(50).optional(),
+    phone: z.string().max(20).optional(),
+    address: z.string().max(200).optional(),
+    shop_no: z.number().int().optional(),
+    aadhar: z.string().max(20).optional(),
+    kgs: z.number().optional(),
 });
 
 

@@ -28,6 +28,9 @@ async function editCustomer(id: string, input: Partial<Customer>) {
             ...(input.rcNumber && { rcNumber: input.rcNumber }),
             ...(input.phone !== undefined && { phone: input.phone }),
             ...(input.address && { address: input.address }),
+            ...(input.shop_no !== undefined && { shop_no: input.shop_no }),
+            ...(input.aadhar !== undefined && { aadhar: input.aadhar }),
+            ...(input.kgs !== undefined && { kgs: input.kgs }),
         }
     });
 }

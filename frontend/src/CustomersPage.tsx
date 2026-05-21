@@ -7,6 +7,9 @@ interface Customer {
   rcNumber: string;
   phone: string;
   address: string;
+  shop_no?: number;
+  aadhar?: string;
+  kgs?: number;
 }
 
 interface FormState {
@@ -14,9 +17,15 @@ interface FormState {
   rcNumber: string;
   phone: string;
   address: string;
+  shop_no: string;
+  aadhar: string;
+  kgs: string;
 }
 
-const emptyForm: FormState = { name: "", rcNumber: "", phone: "", address: "" };
+const emptyForm: FormState = {
+  name: "", rcNumber: "", phone: "", address: "",
+  shop_no: "", aadhar: "", kgs: "",
+};
 
 type FormMode = "add" | "edit";
 
@@ -71,6 +80,9 @@ export function CustomersPage() {
       rcNumber: customer.rcNumber,
       phone: customer.phone ?? "",
       address: customer.address,
+      shop_no: customer.shop_no?.toString() ?? "",
+      aadhar: customer.aadhar ?? "",
+      kgs: customer.kgs?.toString() ?? "",
     });
     setSubmitError(null);
     setShowForm(true);
@@ -78,8 +90,8 @@ export function CustomersPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.rcNumber.trim() || !form.address.trim()) {
-      setSubmitError("Name, RC Number and Address are required.");
+    if (!form.name.trim()) {
+      setSubmitError("Name is required.");
       return;
     }
     setSubmitting(true);
@@ -88,10 +100,18 @@ export function CustomersPage() {
       const isEdit = formMode === "edit" && editingId;
       const url = isEdit ? getCustomerUrl(editingId) : getCustomersUrl();
       const method = isEdit ? "PUT" : "POST";
+
+      const payload = {
+        ...form,
+        shop_no: form.shop_no.trim() ? parseInt(form.shop_no, 10) : undefined,
+        kgs: form.kgs.trim() ? parseFloat(form.kgs) : undefined,
+        aadhar: form.aadhar.trim() || undefined,
+      };
+
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
       const json = await res.json();
       if (!res.ok) {
@@ -158,45 +178,60 @@ export function CustomersPage() {
               <div className="form-field">
                 <label htmlFor="name">Name *</label>
                 <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  value={form.name}
-                  onChange={handleChange}
+                  id="name" name="name" type="text"
+                  value={form.name} onChange={handleChange}
                   placeholder="Customer name"
                 />
               </div>
               <div className="form-field">
-                <label htmlFor="rcNumber">RC Number *</label>
+                <label htmlFor="rcNumber">RC Number</label>
                 <input
-                  id="rcNumber"
-                  name="rcNumber"
-                  type="text"
-                  value={form.rcNumber}
-                  onChange={handleChange}
+                  id="rcNumber" name="rcNumber" type="text"
+                  value={form.rcNumber} onChange={handleChange}
                   placeholder="Ration card number"
                 />
               </div>
               <div className="form-field">
                 <label htmlFor="phone">Phone</label>
                 <input
-                  id="phone"
-                  name="phone"
-                  type="text"
-                  value={form.phone}
-                  onChange={handleChange}
+                  id="phone" name="phone" type="text"
+                  value={form.phone} onChange={handleChange}
                   placeholder="Mobile number"
                 />
               </div>
               <div className="form-field">
-                <label htmlFor="address">Address *</label>
+                <label htmlFor="address">Address</label>
                 <input
-                  id="address"
-                  name="address"
-                  type="text"
-                  value={form.address}
-                  onChange={handleChange}
+                  id="address" name="address" type="text"
+                  value={form.address} onChange={handleChange}
                   placeholder="Full address"
+                />
+              </div>
+              <div className="form-field">
+                <label htmlFor="shop_no">Shop No</label>
+                <input
+                  id="shop_no" name="shop_no" type="number"
+                  value={form.shop_no} onChange={handleChange}
+                  placeholder="Shop number"
+                />
+              </div>
+              <div className="form-field">
+                <label htmlFor="aadhar">Aadhar</label>
+                <input
+                  id="aadhar" name="aadhar" type="text"
+                  inputMode="numeric"
+                  value={form.aadhar} onChange={handleChange}
+                  placeholder="12-digit Aadhar number"
+                  maxLength={12}
+                />
+              </div>
+              <div className="form-field">
+                <label htmlFor="kgs">KGs</label>
+                <input
+                  id="kgs" name="kgs" type="number"
+                  step="0.01"
+                  value={form.kgs} onChange={handleChange}
+                  placeholder="Kg allocation"
                 />
               </div>
             </div>
@@ -226,17 +261,20 @@ export function CustomersPage() {
                 <th>RC Number</th>
                 <th>Phone</th>
                 <th>Address</th>
+                <th>Shop No</th>
+                <th>Aadhar</th>
+                <th>KGs</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr className="loading-row">
-                  <td colSpan={5}>Loading customers...</td>
+                  <td colSpan={8}>Loading customers...</td>
                 </tr>
               ) : customers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} style={{ textAlign: "center", padding: "30px", color: "var(--text-muted)" }}>
+                  <td colSpan={8} style={{ textAlign: "center", padding: "30px", color: "var(--text-muted)" }}>
                     No customers yet. Add one above.
                   </td>
                 </tr>
@@ -247,6 +285,9 @@ export function CustomersPage() {
                     <td>{c.rcNumber}</td>
                     <td>{c.phone || "—"}</td>
                     <td>{c.address}</td>
+                    <td>{c.shop_no ?? "—"}</td>
+                    <td>{c.aadhar || "—"}</td>
+                    <td>{c.kgs != null ? c.kgs : "—"}</td>
                     <td>
                       <div className="row-actions">
                         <button
