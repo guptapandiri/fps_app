@@ -11,7 +11,7 @@ export default defineConfig({
         target: 'https://aepos.ap.gov.in',
         changeOrigin: true,
         secure: false,
-      }
+      },
     }
   }
 })

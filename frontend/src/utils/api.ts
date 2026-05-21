@@ -88,3 +88,12 @@ export const getStockApiUrlByFpsId = (fpsId: string) => {
 };
 
 export const getApiUrl = getTransactionsApiUrl;
+
+// ── Backend (Cloud Run / local Express) ──────────────────────────────────────
+
+const getBackendBaseUrl = () => {
+  return import.meta.env.VITE_BACKEND_URL?.trim() ?? "https://fps-backend-687545653075.us-central1.run.app";
+};
+
+export const getCustomersUrl = () => `${getBackendBaseUrl()}/api/customers`;
+export const getCustomerUrl = (id: string) => `${getBackendBaseUrl()}/api/customers/${id}`;

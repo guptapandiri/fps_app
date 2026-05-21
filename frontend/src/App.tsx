@@ -9,6 +9,7 @@ import type { CommodityList, StockRegisterEntry, Transaction } from "./types";
 import { TransactionsAccordion } from "./TransactionsAccordion";
 import { StockAccordion } from "./StockAccordion";
 import { PortabilityAccordion } from "./PortabilityAccordion";
+import { CustomersPage } from "./CustomersPage";
 import "./App.css";
 import "./accordion.css";
 
@@ -291,6 +292,15 @@ function App() {
           >
             <span>Stock Status</span>
           </li>
+          <li
+            className={`nav-item ${activeTab === "customers" ? "active" : ""}`}
+            onClick={() => {
+              setActiveTab("customers");
+              closeSidebar();
+            }}
+          >
+            <span>Customers</span>
+          </li>
           <li className="nav-item">
             <span>Reports</span>
           </li>
@@ -299,207 +309,215 @@ function App() {
 
       {/* Main Content */}
       <main className="main-content">
-        <header className="header-bar">
-          <div>
-            <h1>FPS Shop Dashboard</h1>
-            <p style={{ textAlign: "left", color: "var(--text-muted)" }}>
-              Welcome back, {mockShopDetails.ownerName}
-            </p>
-          </div>
-          <div className="fps-search-bar">
-            <label htmlFor="fps-id-input">FPS</label>
-            <input
-              id="fps-id-input"
-              type="text"
-              value={fpsInput}
-              onChange={(event) => setFpsInput(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  handleSearch();
-                }
-              }}
-              placeholder="Enter FPS Number"
-            />
-            <button type="button" onClick={handleSearch}>
-              Search
-            </button>
-          </div>
-          <div className="shop-info-badge">
-            <strong>Shop ID:</strong> {selectedFpsId} |{" "}
-            <strong>Location:</strong> {mockShopDetails.location}
-          </div>
-        </header>
-
-        {error && (
-          <div
-            style={{
-              background: "#fff3cd",
-              color: "#856404",
-              padding: "10px",
-              borderRadius: "8px",
-              marginBottom: "20px",
-              border: "1px solid #ffeeba",
-            }}
-          >
-            {error}
-          </div>
+        {activeTab === "customers" && (
+          <>
+            <header className="header-bar">
+              <div>
+                <h1>Customers</h1>
+                <p style={{ textAlign: "left", color: "var(--text-muted)" }}>
+                  Manage registered ration card holders
+                </p>
+              </div>
+            </header>
+            <CustomersPage />
+          </>
         )}
+        {activeTab !== "customers" && (
+          <>
+            <header className="header-bar">
+              <div>
+                <h1>FPS Shop Dashboard</h1>
+                <p style={{ textAlign: "left", color: "var(--text-muted)" }}>
+                  Welcome back, {mockShopDetails.ownerName}
+                </p>
+              </div>
+              <div className="fps-search-bar">
+                <label htmlFor="fps-id-input">FPS</label>
+                <input
+                  id="fps-id-input"
+                  type="text"
+                  value={fpsInput}
+                  onChange={(event) => setFpsInput(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      handleSearch();
+                    }
+                  }}
+                  placeholder="Enter FPS Number"
+                />
+                <button type="button" onClick={handleSearch}>
+                  Search
+                </button>
+              </div>
+              <div className="shop-info-badge">
+                <strong>Shop ID:</strong> {selectedFpsId} |{" "}
+                <strong>Location:</strong> {mockShopDetails.location}
+              </div>
+            </header>
 
-        {/* Stats Grid */}
-        <div className="stats-grid">
-          <div className="stat-card info">
-            <span className="stat-label">Rice Distributed (Today)</span>
-            <div className={`stat-value ${transactionsLoading ? "is-loading" : ""}`}>
-              {transactionsLoading ? "Loading..." : `${totalRiceToday} Kgs`}
+            {error && (
+              <div
+                style={{
+                  background: "#fff3cd",
+                  color: "#856404",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  marginBottom: "20px",
+                  border: "1px solid #ffeeba",
+                }}
+              >
+                {error}
+              </div>
+            )}
+
+            {/* Stats Grid */}
+            <div className="stats-grid">
+              <div className="stat-card info">
+                <span className="stat-label">Rice Distributed (Today)</span>
+                <div className={`stat-value ${transactionsLoading ? "is-loading" : ""}`}>
+                  {transactionsLoading ? "Loading..." : `${totalRiceToday} Kgs`}
+                </div>
+                <small style={{ color: "var(--text-muted)" }}>
+                  {transactionsLoading ? "Month: Loading..." : `Month: ${totalRiceMonth} Kgs`}
+                </small>
+              </div>
+              <div className="stat-card warning">
+                <span className="stat-label">Transactions (Today)</span>
+                <div className={`stat-value ${transactionsLoading ? "is-loading" : ""}`}>
+                  {transactionsLoading ? "Loading..." : todayTransactions.length}
+                </div>
+                <small style={{ color: "var(--text-muted)" }}>
+                  {transactionsLoading ? "Total Month: Loading..." : `Total Month: ${transactions.length}`}
+                </small>
+              </div>
+              <div className="stat-card">
+                <span className="stat-label">Closing Balance (Rice)</span>
+                <div className={`stat-value ${stockLoading ? "is-loading" : ""}`}>
+                  {stockLoading ? "Loading..." : `${riceClosingBalance.toFixed(3)} Kgs`}
+                </div>
+                <small style={{ color: "var(--text-muted)" }}>
+                  Target: 2000 Kgs
+                </small>
+              </div>
             </div>
-            <small style={{ color: "var(--text-muted)" }}>
-              {transactionsLoading ? "Month: Loading..." : `Month: ${totalRiceMonth} Kgs`}
-            </small>
-          </div>
-          <div className="stat-card warning">
-            <span className="stat-label">Transactions (Today)</span>
-            <div className={`stat-value ${transactionsLoading ? "is-loading" : ""}`}>
-              {transactionsLoading ? "Loading..." : todayTransactions.length}
-            </div>
-            <small style={{ color: "var(--text-muted)" }}>
-              {transactionsLoading ? "Total Month: Loading..." : `Total Month: ${transactions.length}`}
-            </small>
-          </div>
-          <div className="stat-card">
-            <span className="stat-label">Closing Balance (Rice)</span>
-            <div className={`stat-value ${stockLoading ? "is-loading" : ""}`}>
-              {stockLoading ? "Loading..." : `${riceClosingBalance.toFixed(3)} Kgs`}
-            </div>
-            <small style={{ color: "var(--text-muted)" }}>
-              Target: 2000 Kgs
-            </small>
-          </div>
-        </div>
 
-        {/* Portability Card */}
-        <div className="card">
-          <div className="card-title">
-            <span>Portability</span>
-            <small style={{ color: "var(--text-muted)", fontWeight: 600 }}>
-              {transactionsLoading
-                ? "Loading counts..."
-                : `Self: ${selfCount} | Other: ${portabilityCount} | Shops: ${otherShopCount}`}
-            </small>
-          </div>
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Port Check</th>
-                  <th>Transactions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactionsLoading ? (
-                  <tr className="loading-row">
-                    <td colSpan={4}>Loading portability summary...</td>
-                  </tr>
-                ) : mainPortability.length > 0 ? (
-                  mainPortability.map((row) => {
-
-                    return (
-                      <tr key={row.portCheck}>
-                        <td>
-                          <strong>{row.portCheck} {row.portCheck === "Self" && `(${selectedFpsId})`}</strong>
-                        </td>
-                        <td>{row.count}</td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan={4} style={{ textAlign: "center", padding: "20px" }}>
-                      No portability data found for the selected period.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Other Portability Accordion */}
-        {otherPortability.length > 0 && (
-          <PortabilityAccordion
-            portabilityRows={otherPortability}
-            loading={transactionsLoading}
-          />
-        )}
-
-        {/* Stock Status Card */}
-        <div className="card">
-          <div className="card-title">Stock Summary (Current Month)</div>
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Commodity</th>
-                  <th>Type</th>
-                  <th>Units</th>
-                  <th>Allocated</th>
-                  <th>OB Qty</th>
-                  <th>Regular</th>
-                  <th>Extra</th>
-                  <th>Moved</th>
-                  <th>Issued Qty</th>
-                  <th>Closing Bal (Kg)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {stockLoading ? (
-                  <tr className="loading-row">
-                    <td colSpan={4}>Loading stock summary...</td>
-                  </tr>
-                ) : activeStock.length > 0 ? (
-                  activeStock.map((s, idx) => (
-                    <tr key={`${s.type ?? "NA"}-${s.commId}-${idx}`}>
-                      <td>
-                        <strong>{s.commNameEn}</strong>
-                      </td>
-                      <td>{s.type}</td>
-                      <td>{s.commMeasureUnit}</td>
-                      <td>{s.allottedQty.toFixed(3)}</td>
-                      <td>{s.ob.toFixed(3)}</td>
-                      <td>{s.receivedQty.toFixed(3)}</td>
-                      <td>{s.extraRo.toFixed(3)}</td>
-                      <td>{s.sixaCase.toFixed(3)}</td>
-                      <td style={{ color: "var(--success)", fontWeight: "600" }}>
-                        {s.issuedQty.toFixed(3)}
-                      </td>
-                      <td style={{ fontWeight: "700" }}>{s.cb.toFixed(3)}</td>
+            {/* Portability Card */}
+            <div className="card">
+              <div className="card-title">
+                <span>Portability</span>
+                <small style={{ color: "var(--text-muted)", fontWeight: 600 }}>
+                  {transactionsLoading
+                    ? "Loading counts..."
+                    : `Self: ${selfCount} | Other: ${portabilityCount} | Shops: ${otherShopCount}`}
+                </small>
+              </div>
+              <div className="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Port Check</th>
+                      <th>Transactions</th>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan={4}
-                      style={{ textAlign: "center", padding: "20px" }}
-                    >
-                      No active stock for the selected period.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                  </thead>
+                  <tbody>
+                    {transactionsLoading ? (
+                      <tr className="loading-row">
+                        <td colSpan={4}>Loading portability summary...</td>
+                      </tr>
+                    ) : mainPortability.length > 0 ? (
+                      mainPortability.map((row) => (
+                        <tr key={row.portCheck}>
+                          <td>
+                            <strong>{row.portCheck} {row.portCheck === "Self" && `(${selectedFpsId})`}</strong>
+                          </td>
+                          <td>{row.count}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={4} style={{ textAlign: "center", padding: "20px" }}>
+                          No portability data found for the selected period.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
-        {/* Other Stock Accordion */}
-        {otherStock.length > 0 && (
-          <StockAccordion stockEntries={otherStock} loading={stockLoading} />
+            {/* Other Portability Accordion */}
+            {otherPortability.length > 0 && (
+              <PortabilityAccordion
+                portabilityRows={otherPortability}
+                loading={transactionsLoading}
+              />
+            )}
+
+            {/* Stock Status Card */}
+            <div className="card">
+              <div className="card-title">Stock Summary (Current Month)</div>
+              <div className="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Commodity</th>
+                      <th>Type</th>
+                      <th>Units</th>
+                      <th>Allocated</th>
+                      <th>OB Qty</th>
+                      <th>Regular</th>
+                      <th>Extra</th>
+                      <th>Moved</th>
+                      <th>Issued Qty</th>
+                      <th>Closing Bal (Kg)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stockLoading ? (
+                      <tr className="loading-row">
+                        <td colSpan={4}>Loading stock summary...</td>
+                      </tr>
+                    ) : activeStock.length > 0 ? (
+                      activeStock.map((s, idx) => (
+                        <tr key={`${s.type ?? "NA"}-${s.commId}-${idx}`}>
+                          <td><strong>{s.commNameEn}</strong></td>
+                          <td>{s.type}</td>
+                          <td>{s.commMeasureUnit}</td>
+                          <td>{s.allottedQty.toFixed(3)}</td>
+                          <td>{s.ob.toFixed(3)}</td>
+                          <td>{s.receivedQty.toFixed(3)}</td>
+                          <td>{s.extraRo.toFixed(3)}</td>
+                          <td>{s.sixaCase.toFixed(3)}</td>
+                          <td style={{ color: "var(--success)", fontWeight: "600" }}>
+                            {s.issuedQty.toFixed(3)}
+                          </td>
+                          <td style={{ fontWeight: "700" }}>{s.cb.toFixed(3)}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={4} style={{ textAlign: "center", padding: "20px" }}>
+                          No active stock for the selected period.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Other Stock Accordion */}
+            {otherStock.length > 0 && (
+              <StockAccordion stockEntries={otherStock} loading={stockLoading} />
+            )}
+
+            {/* Transactions Accordion */}
+            <TransactionsAccordion
+              transactions={transactions}
+              loading={transactionsLoading}
+            />
+          </>
         )}
-
-        {/* Transactions Accordion */}
-        <TransactionsAccordion
-          transactions={transactions}
-          loading={transactionsLoading}
-        />
-
       </main>
     </div>
   );
