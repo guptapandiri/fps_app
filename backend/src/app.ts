@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import { customerRoutes } from './src/customers/customer.routes';
+import { customerRoutes } from './customers/customer.routes.ts';
 
 const app = express();
 
