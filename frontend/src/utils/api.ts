@@ -31,7 +31,9 @@ const resolveEndpointUrl = ({
   fpsId,
   prodApiUrl,
 }: EndpointConfig) => {
-  const fpsQuery = `fpsId=${fpsId}&month=5&year=2026`;
+  const month = new Date().getMonth() + 1;
+  const year = new Date().getFullYear();
+  const fpsQuery = `fpsId=${fpsId}&month=${month}&year=${year}`;
   const apiPath = `${endpointPath}?${fpsQuery}`;
   const targetUrl = `https://aepos.ap.gov.in${endpointPath}?${fpsQuery}`;
   const netlifyPath = `/api${endpointPath}?${fpsQuery}`;
