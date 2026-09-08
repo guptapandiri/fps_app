@@ -24,6 +24,7 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [fpsInput, setFpsInput] = useState(getInitialFpsId);
   const [selectedFpsId, setSelectedFpsId] = useState(getInitialFpsId);
+  const [searchRequestId, setSearchRequestId] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [stockEntries, setStockEntries] = useState<StockRegisterEntry[]>([]);
   const [transactionsLoading, setTransactionsLoading] = useState(true);
@@ -161,7 +162,7 @@ function App() {
       controller.abort();
       window.clearTimeout(timeoutId);
     };
-  }, [selectedFpsId]);
+  }, [selectedFpsId, searchRequestId]);
 
   const handleSearch = () => {
     const trimmedFpsId = fpsInput.trim();
@@ -172,6 +173,7 @@ function App() {
 
     window.localStorage.setItem(FPS_STORAGE_KEY, trimmedFpsId);
     setSelectedFpsId(trimmedFpsId);
+    setSearchRequestId((requestId) => requestId + 1);
     setError(null);
   };
 
