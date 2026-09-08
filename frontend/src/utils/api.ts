@@ -25,6 +25,7 @@ type EndpointConfig = {
   fpsId: string;
   prodApiUrl?: string;
   useQueryParams?: boolean;
+  netlifyPathOverride?: string;
 };
 
 const resolveEndpointUrl = ({
@@ -32,6 +33,7 @@ const resolveEndpointUrl = ({
   fpsId,
   prodApiUrl,
   useQueryParams = true,
+  netlifyPathOverride,
 }: EndpointConfig) => {
   const month = new Date().getMonth() + 1;
   const year = new Date().getFullYear();
@@ -39,7 +41,8 @@ const resolveEndpointUrl = ({
   const querySuffix = useQueryParams ? `?${fpsQuery}` : "";
   const apiPath = `${endpointPath}${querySuffix}`;
   const targetUrl = `https://aepos.ap.gov.in${endpointPath}${querySuffix}`;
-  const netlifyPath = `/api${endpointPath}${querySuffix}`;
+  const netlifyPath =
+    netlifyPathOverride ?? `/api${endpointPath}${querySuffix}`;
 
   if (import.meta.env.DEV) {
     return apiPath;
@@ -66,6 +69,7 @@ export const getTransactionsApiUrl = () => {
     fpsId: FPS_ID,
     prodApiUrl: import.meta.env.VITE_PROD_API_URL,
     useQueryParams: false,
+    netlifyPathOverride: "/.netlify/functions/fps-transactions",
   });
 };
 
@@ -75,6 +79,7 @@ export const getTransactionsApiUrlByFpsId = (fpsId: string) => {
     fpsId,
     prodApiUrl: import.meta.env.VITE_PROD_API_URL,
     useQueryParams: false,
+    netlifyPathOverride: "/.netlify/functions/fps-transactions",
   });
 };
 
