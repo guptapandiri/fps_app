@@ -11,6 +11,15 @@ export default defineConfig({
         target: 'https://aepos.ap.gov.in',
         changeOrigin: true,
         secure: false,
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyRequest) => {
+            // The ePoS server rejects localhost browser origins with
+            // "Invalid CORS request". This hop is server-to-server, so make
+            // it equivalent to the working Postman request.
+            proxyRequest.removeHeader('origin')
+            proxyRequest.removeHeader('referer')
+          })
+        },
       },
     }
   }

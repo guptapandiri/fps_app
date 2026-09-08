@@ -4,6 +4,7 @@ import {
   FPS_ID,
   getStockApiUrlByFpsId,
   getTransactionsApiUrlByFpsId,
+  getTransactionsRequestBodyByFpsId,
 } from "./utils/api";
 import type { CommodityList, StockRegisterEntry, Transaction } from "./types";
 import { TransactionsAccordion } from "./TransactionsAccordion";
@@ -60,8 +61,15 @@ function App() {
     }, REQUEST_TIMEOUT_MS);
     let isCancelled = false;
 
-    const fetchJson = async <T,>(url: string, errorMessage: string) => {
-      const response = await fetch(url, { signal: controller.signal });
+    const fetchJson = async <T,>(
+      url: string,
+      errorMessage: string,
+      requestInit?: RequestInit,
+    ) => {
+      const response = await fetch(url, {
+        ...requestInit,
+        signal: controller.signal,
+      });
       if (!response.ok) {
         throw new Error(errorMessage);
       }
@@ -95,6 +103,13 @@ function App() {
           fetchJson<Transaction[]>(
             getTransactionsApiUrlByFpsId(selectedFpsId),
             "Failed to fetch transaction data",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(
+                getTransactionsRequestBodyByFpsId(selectedFpsId),
+              ),
+            },
           ),
           fetchJson<StockRegisterEntry[]>(
             getStockApiUrlByFpsId(selectedFpsId),
@@ -219,9 +234,10 @@ function App() {
   const mainPortability = portabilityRows.filter((row) => row.count > 10);
   const otherPortability = portabilityRows.filter((row) => row.count <= 10);
   const riceStock = stockEntries.find(
-    (s) => s.commNameEn === "FRice" && s.type?.toUpperCase() === "PDS",
+    (s) => s.commNameEn === "Rice" && s.type?.toUpperCase() === "PDS",
   );
-  const riceClosingBalance = riceStock?.cb ?? 0;
+  const regularRiceBalance = riceStock?.receivedQty ?? 0;
+  const riceClosingBalance = regularRiceBalance - totalRiceMonth;
 
   const activeStock = stockEntries.filter((s) => s.receivedQty > 0);
   const otherStock = stockEntries.filter((s) => s.receivedQty <= 0);

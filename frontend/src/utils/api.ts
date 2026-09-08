@@ -24,19 +24,22 @@ type EndpointConfig = {
   endpointPath: string;
   fpsId: string;
   prodApiUrl?: string;
+  useQueryParams?: boolean;
 };
 
 const resolveEndpointUrl = ({
   endpointPath,
   fpsId,
   prodApiUrl,
+  useQueryParams = true,
 }: EndpointConfig) => {
   const month = new Date().getMonth() + 1;
   const year = new Date().getFullYear();
   const fpsQuery = `fpsId=${fpsId}&month=${month}&year=${year}`;
-  const apiPath = `${endpointPath}?${fpsQuery}`;
-  const targetUrl = `https://aepos.ap.gov.in${endpointPath}?${fpsQuery}`;
-  const netlifyPath = `/api${endpointPath}?${fpsQuery}`;
+  const querySuffix = useQueryParams ? `?${fpsQuery}` : "";
+  const apiPath = `${endpointPath}${querySuffix}`;
+  const targetUrl = `https://aepos.ap.gov.in${endpointPath}${querySuffix}`;
+  const netlifyPath = `/api${endpointPath}${querySuffix}`;
 
   if (import.meta.env.DEV) {
     return apiPath;
@@ -59,18 +62,30 @@ const resolveEndpointUrl = ({
 
 export const getTransactionsApiUrl = () => {
   return resolveEndpointUrl({
-    endpointPath: "/Epos_Spring/fps/fpstransaction",
+    endpointPath: "/Epos_Spring/fps/fpstransactionwitoutcatptcha",
     fpsId: FPS_ID,
     prodApiUrl: import.meta.env.VITE_PROD_API_URL,
+    useQueryParams: false,
   });
 };
 
 export const getTransactionsApiUrlByFpsId = (fpsId: string) => {
   return resolveEndpointUrl({
-    endpointPath: "/Epos_Spring/fps/fpstransaction",
+    endpointPath: "/Epos_Spring/fps/fpstransactionwitoutcatptcha",
     fpsId,
     prodApiUrl: import.meta.env.VITE_PROD_API_URL,
+    useQueryParams: false,
   });
+};
+
+export const getTransactionsRequestBodyByFpsId = (fpsId: string) => {
+  const now = new Date();
+
+  return {
+    fps_id: fpsId,
+    month: String(now.getMonth() + 1),
+    year: String(now.getFullYear()),
+  };
 };
 
 export const getStockApiUrl = () => {
